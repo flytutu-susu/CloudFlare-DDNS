@@ -1,0 +1,32 @@
+DDNS Service Exception Alert - DNS update failure
+<!--email title-->
+<p>
+    <span>
+        Hello,
+    </span>
+</p>
+<p>
+    <span>
+        Your IP has changed, the current IP is: ${new_ip}, but due to the network error, the CloudFlare DDNS program is unable to push your new IP to CloudFlare. the CloudFlare DDNS service will not stop immediately, it will try to push it a few more times.
+    </span>
+</p>
+<p>
+    <span>
+        You can connect to the server to check the exception details through log/DDNS.log file, <b>please check the reason and restart CloudFlare DDNS service as soon as possible</b> to avoid the IP change that your server cannot be accessed through the domain name.
+    </span>
+</p>
+<p>
+    <span>
+        The following is your current domain information:
+    </span>
+</p>
+<p>
+    <span>
+        Please feedback any questions in <a target="_blank" href="https://github.com/flytutu-susu/CloudFlare-DDNS">GitHub Issues</a> of the CloudFlare DDNS project, thank you for your support.
+    </span>
+</p>
+<p>
+    <span>
+        The following is your current domain information:
+    </span>
+</p>

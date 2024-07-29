@@ -1,0 +1,117 @@
+#!/bin/bash
+# chkconfig:2345 60 30
+# description: DDNS
+
+# 以上为开机自启配置
+
+# 配置工作目录
+cd /root/Cloudflare-DDNS
+check=`ls|grep 'ddns.py\|conf.json'`
+if [ -z "$check" ]
+then
+    echo $"The working directory is incorrect, please check the configuration on the 13 line of $0"
+    exit -1
+fi
+
+# 设置python3路径
+pythonBin=python3
+
+service_name=DDNS
+key_word=ddns.py
+
+function findps()
+{
+    if [ "$1" = "print" ]
+    then
+        ps -ef|grep $key_word|grep -vE "(grep|$0|service.*$key_word|systemctl)"
+    else
+        fps=`ps -ef|grep $key_word|grep -vE "(grep|$0|service.*$key_word|systemctl)"`
+    fi
+}
+
+function startps()
+{
+    if [ ! -d "log" ]
+    then
+        mkdir log
+    fi
+    nohup $pythonBin ddns.py >> log/DDNS.log 2>&1 &
+}
+
+function killps()
+{
+    ps -ef|grep $key_word|grep -vE '(grep|$0|service.*$key_word|systemctl)'| cut -c 7-16|xargs kill -9
+}
+
+case "$1" in
+start)
+findps;
+if [ -z "$fps" ]
+then
+    startps;
+    echo -e "\033[32;1mStarted successfully\033[0m"
+else
+    echo -e "\033[31;1m$service_name service is already running! \033[0m"
+    exit 1
+fi
+;;
+################################
+stop)
+findps;
+if [ -z "$fps" ]
+then
+    echo -e "\033[31;1m$service_name service is not running! \033[0m"
+    exit 1
+else
+    killps;
+fi
+echo -e "\033[32;1mStopped successfully\033[0m"
+;;
+#################################
+restart|force-reload)
+findps;
+if [ -n "$fps" ]
+then
+    killps;
+fi
+echo -e "\033[32;1mStopped successfully\033[0m"
+
+sleep 0.5
+
+startps;
+echo -e "\033[32;1mStarted successfully\033[0m"
+;;
+########################################
+status)
+findps;
+if [ -z "$fps" ]
+then
+    echo -e "\033[31;1m$service_name service is stopped\033[0m"
+
+else
+    echo -e "\033[32;1m$service_name service is running\033[0m"
+    findps print
+    echo "================="
+    echo "Update history:"
+    grep -B 0 'update_dns_api:.*update.*completed.*' log/DDNS.log
+    echo "================="
+    echo "Latest operation:"
+    tail -2 log/DDNS.log
+fi
+;;
+########################################
+testEmail)
+$pythonBin ddns.py --test-email
+;;
+########################################
+archiveLog)
+$pythonBin ddns.py --archive
+;;
+########################################
+*)
+echo $"Usage: $0 {start|stop|status|restart|force-reload|testEmail|archiveLog}"
+
+esac
+
+exit 0
+
