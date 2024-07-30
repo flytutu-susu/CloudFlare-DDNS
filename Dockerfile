@@ -1,5 +1,5 @@
 FROM python:3.10.11-alpine3.16
-LABEL maintainer="https://github.com/flytutu-susu/Cloudflare-DDNS"
+LABEL maintainer="https://github.com/flytutu-susu/CloudFlare-DDNS"
 LABEL description="Cloudflare-DDNS"
 
 ENV TZ Asia/Shanghai

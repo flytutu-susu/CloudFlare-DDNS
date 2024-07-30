@@ -100,12 +100,15 @@ class CloudFlareClient:
                     'X-Auth-Email': self._api_id,
                     'X-Auth-Key': self._api_key
                 })
-                cache[domain['domain']] = json.loads(ro.text)
                 if ro.status_code != 200:
                     self._logger.error('\tError, process stopped. It could be due to the '
                                        'configuration file error, or the CloudFlare server error.')
                     sys.exit(-1)
                 ro = json.loads(ro.text)
+                if ro['success'] == False:
+                    self._logger.error(f"update failed, err: {ro['errors']}")
+                    sys.exit(-1)
+                cache[domain['domain']] = ro
             r = ro['result']
             _domain = domain['domain'] if domain['host'] == '@' or \
                                           domain['host'] == '' else f"{domain['host']}.{domain['domain']}"
@@ -176,26 +179,25 @@ class CloudFlareClient:
                     'ttl': self.ttl,
                     'proxied': False
                 }
-                body = json.dumps(body)
-                r = self._http_client.put(url, headers = {
+                r = self._http_client.patch(url, headers = {
                     **self._http_client.headers,
                     'X-Auth-Email': self._api_id,
                     'X-Auth-Key': self._api_key
-                }, data = body)
-                r = r1 = json.loads(r.text)
+                }, json = body)
+                r =  json.loads(r.text)
+                if r['success'] == False:
+                    self._logger.error(f"errors: {r['errors']}")
+                    sys.exit(-1)
                 domain_ip = r['result']['content']
                 if domain_ip == new_ip:
                     domain['domain_ip'] = new_ip
                     self._logger.info(f"\tupdate '{full_domain}' "
                                       f"completed: {domain['domain_ip']}")
                     success = success + 1
-                elif r['success'] == False :
-                    self._logger.error(f'errors: {r1['errors']}\nmessages: {r1['messages']}\n')
-                    sys.exit(-1)
                 else:
                     fail = fail + 1
                     self._logger.error(f"\tupdate '{full_domain}' failed. "
-                                       f"Namesilo response:\n{r1}")
+                                       f"Cloudflare response:\n{r}")
             except Exception as e:
                 exception = exception + 1
                 self._logger.exception(e)
@@ -295,7 +297,7 @@ class DesensitizeKeyFilter(logging.Filter):
         self.key = key
 
     def filter(self, record):
-        tmp = (arg.__str__().replace(f'key={self.key}', 'key=****') if isinstance(arg, httpx.headers) else arg for
+        tmp = (arg.__str__().replace(f'key={self.key}', 'key=****') if isinstance(arg, httpx.Headers) else arg for
                arg in record.args)
         record.args = tuple(tmp)
         return True
