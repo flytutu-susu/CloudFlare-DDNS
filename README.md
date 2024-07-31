@@ -45,7 +45,6 @@ CloudFlare DDNS是一个用于CloudFlare的动态域名解析服务，适用于�
     - [6.2 Start](#62-start)
     - [6.3 Log](#63-log)
     - [6.4 Start At Boot](#64-start-at-boot)
-- [7. Links](#7-links)
 
 
 
@@ -94,13 +93,13 @@ docker restart ddns
 
 # 3. Configuration
 
-启动前需要配置`conf/conf.json`文件，参考conf.json.example，**只有domains和key两项配置是必要的**，其余的可以不进行配置。
+启动前需要配置`conf/conf.json`文件，参考conf.json.example，**只有domains、id、zone_id和key四项配置是必要的**，其余的可以不进行配置。
 
 
 
 | 字段                     | 介绍                                                                                                                                                           |
 |------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| domains                | A记录类型的域名，用于IPv4。支持同时更新多个域名，支持二级域名、三级域名等，如`["cc.bb.cn","q.w.cc.cn"]`。如果只使用IPv6，此项留白即可<br>程序只能更新已存在的DNS记录，而不能创建一个新的DNS记录。所以你**必须先在NameSilo网页上创建一个解析**后，才能运行程序。 |
+| domains                | A记录类型的域名，用于IPv4。支持同时更新多个域名，支持二级域名、三级域名等，如`["cc.bb.cn","q.w.cc.cn"]`。如果只使用IPv6，此项留白即可<br>程序只能更新已存在的DNS记录，而不能创建一个新的DNS记录。所以你**必须先在CloudFlare网页上创建一个解析**后，才能运行程序。 |
 | domains_ipv6           | AAAA记录类型的域名，用于IPv6。如果只使用IPv4，此项留白即可。docker中使用IPv6，run命令需要`--network host`选项                                                                                  |
 | ttl                    | Time To Live, DNS解析记录在DNS服务器上缓存时间，默认3600秒                                                                                                                    |
 | id                     | cloudflare 的注册账号名称，一般为邮箱                                                       |
@@ -121,7 +120,7 @@ docker restart ddns
 
 Q：邮件功能有什么用？
 
-A：会收到以下邮件：ip变动后，推送NameSilo成功；推送失败；程序因意外情况停止；程序自动重启
+A：会收到以下邮件：ip变动后，推送CloudFlare成功；推送失败；程序因意外情况停止；程序自动重启
 
 Q：如何开启邮件功能？
 
@@ -157,7 +156,7 @@ Doker的优点是不需要安装python环境，在开机自动启动方面不需
 docker pull hesu65535/ddns
 ```
 
-本镜像基于最小的Linux alpine构建，Docker Hub显示21.37M，`docker images`显示镜像大小为59.4M
+本镜像基于最小的Linux alpine构建，Docker Hub显示22.04 M，`docker images`显示镜像大小为59.4M
 
 Docker Hub中的镜像不一定是最新的，你也可以选择手动构建镜像
 
@@ -202,10 +201,6 @@ docker update --restart=always ddns
 ```shell
 <local dir>/ddns-docker
 ```
-
-![](example.png)
-
-
 
 查看所有日志文件：
 
@@ -259,7 +254,7 @@ python ddns.py
 
 `DDNS`文件是一个功能强大的脚本，可以后台启动ddns.py程序，检测程序是否在后台运行，以及杀死程序
 
-使用之前先编辑DDNS文件，修改第8行为NameSilo-DDNS项目的**绝对路径**，修改第17行为python 3可执行文件路径即。这样做是为了在使用软链或设置程序随系统启动时能找到项目路径
+使用之前先编辑DDNS文件，修改第8行为CloudFlare-DDNS项目的**绝对路径**，修改第17行为python 3可执行文件路径即。这样做是为了在使用软链或设置程序随系统启动时能找到项目路径
 
 `DDNS`脚本使用方法：
 
@@ -276,7 +271,7 @@ chmod +x DDNS
 如果想在任何地方使用`DDNS`命令，可以在`/usr/bin`目录下建立软链接，注意`ln`命令要使用绝对路径，如
 
 ```
-ln -s /root/NameSilo-DDNS/DDNS /usr/bin/DDNS
+ln -s /root/CloudFlare-DDNS/DDNS /usr/bin/DDNS
 ```
 
 

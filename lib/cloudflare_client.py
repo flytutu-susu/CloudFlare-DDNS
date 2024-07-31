@@ -176,8 +176,8 @@ class CloudFlareClient:
                     'type': t,
                     'name': full_domain,
                     'content': new_ip,
-                    'ttl': self.ttl,
-                    'proxied': False
+                    'ttl': self.ttl
+                    # 'proxied': False
                 }
                 r = self._http_client.patch(url, headers = {
                     **self._http_client.headers,
