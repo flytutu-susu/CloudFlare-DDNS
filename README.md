@@ -85,7 +85,7 @@ IPv6就简单了，运营商目前都给宽带配备了IPv6地址，只需在路
 ```shell
 mkdir -p /home/docker/ddns
 docker pull hesu65535/ddns
-docker run -d --name ddns -v /home/docker/ddns:/home/NameSilo-DDNS:rw --network host hesu65535/ddns
+docker run -d --name ddns -v /home/docker/ddns:/home/CloudFlare-DDNS:rw --network host hesu65535/ddns
 # run命令可选项-启动docker时启动容器: --restart=always
 # run命令可选项-时区: -e TZ=Asia/Shanghai
 cp /home/docker/ddns/conf/conf.json.example /home/docker/ddns/conf/conf.json
@@ -161,7 +161,7 @@ Doker的优点是不需要安装python环境，在开机自动启动方面不需
 <b>从Docker Hub拉取</b>
 
 ```shell
-docker pull charles94jp/ddns
+docker pull hesu65535/ddns
 ```
 
 本镜像基于最小的Linux alpine构建，Docker Hub显示21.37M，`docker images`显示镜像大小为57M
@@ -173,21 +173,22 @@ Docker Hub中的镜像不一定是最新的，你也可以选择手动构建镜�
 <b>手动构建镜像</b>
 
 ```shell
-docker build -t charles94jp/ddns .
+docker build --network=host -t hesu65535/ddns .
 ```
 
 构建过程中下载`python:3.x.x-alpine`镜像和`pip install httpx`需要一点时间
+构建时需要指定使用主机网络，否则可能会在install httpx模块时出现网络连接问题
 
 
 
 ## 5.2 RUN
 
 ```shell
-docker run -d --name ddns -v <local dir>:/home/NameSilo-DDNS:rw --network host charles94jp/ddns
+docker run -d --name ddns -v <local dir>:/home/CloudFlare-DDNS:rw --network host hesu65535/ddns
 # --restart=always
 ```
 
-一定要用 -v 参数将本机的目录`<local dir>`挂载到容器内的`/home/NameSilo-DDNS`，容器会将程序文件写出到`<local dir>`
+一定要用 -v 参数将本机的目录`<local dir>`挂载到容器内的`/home/CloudFlare-DDNS`，容器会将程序文件写出到`<local dir>`
 
 接着在`<local dir>`中配置`conf/conf.json`，参考[Configuration](#configuration)
 
@@ -247,7 +248,7 @@ ls -lh log/DDNS*.log*
 下载即用
 
 ```
-git clone -b python https://github.com/Charles94jp/NameSilo-DDNS.git
+git clone -b python https://github.com/flytutu-susu/CloudFlare-DDNS.git
 ```
 
 需要使用python3来运行，python需要安装httpx模块：
@@ -278,7 +279,7 @@ python ddns.py
 
 `DDNS`文件是一个功能强大的脚本，可以后台启动ddns.py程序，检测程序是否在后台运行，以及杀死程序
 
-使用之前先编辑DDNS文件，修改第8行为NameSilo-DDNS项目的**绝对路径**，修改第17行为python 3可执行文件路径即。这样做是为了在使用软链或设置程序随系统启动时能找到项目路径
+使用之前先编辑DDNS文件，修改第8行为CloudFlare-DDNS项目的**绝对路径**，修改第17行为python 3可执行文件路径即。这样做是为了在使用软链或设置程序随系统启动时能找到项目路径
 
 `DDNS`脚本使用方法：
 
@@ -295,7 +296,7 @@ chmod +x DDNS
 如果想在任何地方使用`DDNS`命令，可以在`/usr/bin`目录下建立软链接，注意`ln`命令要使用绝对路径，如
 
 ```
-ln -s /root/NameSilo-DDNS/DDNS /usr/bin/DDNS
+ln -s /root/CloudFlare-DDNS/DDNS /usr/bin/DDNS
 ```
 
 
