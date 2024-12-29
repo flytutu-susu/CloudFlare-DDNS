@@ -1,10 +1,3 @@
-<h1 align="center">
-  <a href="#">
-  <img src="logo.svg" width="300px">
-  </a>
-  <br>
-</h1>
-
 <p align="center">
 <a href="https://github.com/flytutu-susu/CloudFlare-DDNS/tree/main"><img src="https://img.shields.io/badge/CloudFlare-DDNS-brightgreen"></a>  
 <a target="_blank" href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-_red.svg"></a>  
@@ -52,7 +45,6 @@ CloudFlare DDNS是一个用于CloudFlare的动态域名解析服务，适用于�
     - [6.2 Start](#62-start)
     - [6.3 Log](#63-log)
     - [6.4 Start At Boot](#64-start-at-boot)
-- [7. Links](#7-links)
 
 
 
@@ -91,7 +83,7 @@ docker run -d --name ddns -v /home/docker/ddns:/home/CloudFlare-DDNS:rw --networ
 cp /home/docker/ddns/conf/conf.json.example /home/docker/ddns/conf/conf.json
 vi /home/docker/ddns/conf/conf.json
 # 填写域名domain和api密钥key
-# api密钥在这里获取: https://www.namesilo.com/account/api-manager
+# api密钥在这里获取: https://dash.cloudflare.com/profile/api-tokens
 docker restart ddns
 ```
 
@@ -101,17 +93,18 @@ docker restart ddns
 
 # 3. Configuration
 
-启动前需要配置`conf/conf.json`文件，参考conf.json.example，**只有domains和key两项配置是必要的**，其余的可以不进行配置。
+启动前需要配置`conf/conf.json`文件，参考conf.json.example，**只有domains、id、zone_id和key四项配置是必要的**，其余的可以不进行配置。
 
 
 
 | 字段                     | 介绍                                                                                                                                                           |
 |------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| domains                | A记录类型的域名，用于IPv4。支持同时更新多个域名，支持二级域名、三级域名等，如`["cc.bb.cn","q.w.cc.cn"]`。如果只使用IPv6，此项留白即可<br>程序只能更新已存在的DNS记录，而不能创建一个新的DNS记录。所以你**必须先在NameSilo网页上创建一个解析**后，才能运行程序。 |
-| ~~domain~~             | `domains` 项的旧版本，目前还兼容。字符串类型，只能是一个域名                                                                                                                          |
+| domains                | A记录类型的域名，用于IPv4。支持同时更新多个域名，支持二级域名、三级域名等，如`["cc.bb.cn","q.w.cc.cn"]`。如果只使用IPv6，此项留白即可<br>程序只能更新已存在的DNS记录，而不能创建一个新的DNS记录。所以你**必须先在CloudFlare网页上创建一个解析**后，才能运行程序。 |
 | domains_ipv6           | AAAA记录类型的域名，用于IPv6。如果只使用IPv4，此项留白即可。docker中使用IPv6，run命令需要`--network host`选项                                                                                  |
 | ttl                    | Time To Live, DNS解析记录在DNS服务器上缓存时间，默认3600秒                                                                                                                    |
-| key                    | <a target="_blank" href="https://guozh.net/obtain-namesilo-api-key/">从NameSilo获取</a>的api key，有key才能获取和修改你的域名状态，保管好不要泄露此key                                   |
+| id                     | cloudflare 的注册账号名称，一般为邮箱                                                       |
+| zone_id                | 网站或者域名的区域id    |
+| key                    | 从Cloudflare获取</a>的api key，有key才能获取和修改你的域名状态，保管好不要泄露此key                                   |
 | frequency              | 多久检测一次你的ip变动，如有变动才更新你的域名解析状态，单位s                                                                                                                             |
 | get_ipv6_local         | v2.2.4版本新增，默认ture。启用将从Python socket模块来获取本机ipv6地址，无需依赖外界，关闭则使用HTTP请求其它服务器来获取本机ipv6。 |
 | mail_host              | SMT邮件服务器，如qq、163等。QQ邮箱[打开POP3/SMTP](https://service.mail.qq.com/detail/0/75)即可                                                     |
@@ -120,7 +113,6 @@ docker restart ddns
 | mail_pass              | 登录密码或key                                                                                                                                                     |
 | receivers              | 数组，收件人地址，可以是多个。收件人 和 发件人 可以是同一个                                                                                                                              |
 | mail_lang              | 邮件的语言。默认zh-cn，可选en-us                                                                                                                                        |
-| ~~email_after_reboot~~ | 从v2.2.0版本起弃用。适用于家里意外断电的情况，当通电后，路由器重新拨号，一般会获得新IP，如果服务器支持来电自动开机，那么DDNS在开机自动启动后，会发送邮件告诉你：你的服务器已成功启动。                                                            |
 | auto_restart           | Linux、macOS下生效，默认不启用。在程序持续异常一段时间后，自我重启。v2.1.0版本已找到异常原因并解决，此项不再重要。                                                                                            |
 | email_every_update     | 每次IP更新都发送邮件告知新IP，避免在DNS更新的十几二十分钟内无法访问。默认关闭，打开的前提是设置了邮件。                                                                                                      |
 
@@ -128,7 +120,7 @@ docker restart ddns
 
 Q：邮件功能有什么用？
 
-A：会收到以下邮件：ip变动后，推送NameSilo成功；推送失败；程序因意外情况停止；程序自动重启
+A：会收到以下邮件：ip变动后，推送CloudFlare成功；推送失败；程序因意外情况停止；程序自动重启
 
 Q：如何开启邮件功能？
 
@@ -164,7 +156,7 @@ Doker的优点是不需要安装python环境，在开机自动启动方面不需
 docker pull hesu65535/ddns
 ```
 
-本镜像基于最小的Linux alpine构建，Docker Hub显示21.37M，`docker images`显示镜像大小为57M
+本镜像基于最小的Linux alpine构建，Docker Hub显示22.04 M，`docker images`显示镜像大小为59.4M
 
 Docker Hub中的镜像不一定是最新的，你也可以选择手动构建镜像
 
@@ -222,10 +214,6 @@ docker update --restart=always ddns
 ```shell
 <local dir>/ddns-docker
 ```
-
-![](example.png)
-
-
 
 查看所有日志文件：
 
